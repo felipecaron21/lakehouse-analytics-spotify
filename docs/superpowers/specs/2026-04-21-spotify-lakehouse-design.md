@@ -170,7 +170,7 @@ lakehouse-analytics-spotify/
 1. Acessar [developer.spotify.com/dashboard](https://developer.spotify.com/dashboard)
 2. Fazer login com conta Spotify
 3. Clicar em "Create App"
-4. Preencher nome, descrição e Redirect URI (`http://localhost:8888`)
+4. Preencher nome, descrição e Redirect URI (`http://127.0.0.1:8888`)
 5. Copiar `Client ID` e `Client Secret` para o arquivo `.env`
 
 ---
