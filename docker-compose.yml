@@ -1,8 +1,10 @@
 x-airflow-common: &airflow-common
-  image: apache/airflow:2.8.4-python3.11
+  build:
+    context: .
+    dockerfile: docker/airflow/Dockerfile
   environment:
     AIRFLOW__CORE__EXECUTOR: LocalExecutor
-    AIRFLOW__CORE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres/${POSTGRES_DB}
+    AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres/${POSTGRES_DB}
     AIRFLOW__CORE__FERNET_KEY: ${AIRFLOW__CORE__FERNET_KEY}
     AIRFLOW__WEBSERVER__SECRET_KEY: ${AIRFLOW__WEBSERVER__SECRET_KEY}
     AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
@@ -46,7 +48,6 @@ services:
     <<: *airflow-common
     command: >
       bash -c "
-        pip install duckdb==0.10.2 dbt-core==1.7.10 dbt-duckdb==1.7.3 requests==2.31.0 python-dotenv==1.0.1 psycopg2-binary==2.9.9 &&
         airflow db migrate &&
         airflow users create --username admin --password admin --firstname Admin --lastname User --role Admin --email admin@example.com
       "
