@@ -12,7 +12,7 @@ Extrai seus dados pessoais da API do Spotify (músicas favoritas, artistas favor
 Spotify API
     │
     ▼
-[DAG 1 — spotify_extraction]  (@weekly)
+[DAG 1 — spotify_extraction]  (manual)
     │  top tracks + top artists + recently played
     ▼
 Bronze Layer (DuckDB)
@@ -113,7 +113,7 @@ docker-compose up -d --build
 3. Dispare o `spotify_extraction` manualmente (botão ▶)
 4. Aguarde — o DAG 2 é disparado automaticamente ao final
 
-O pipeline roda automaticamente toda semana (`@weekly`).
+O pipeline é disparado manualmente pelo Airflow.
 
 ---
 

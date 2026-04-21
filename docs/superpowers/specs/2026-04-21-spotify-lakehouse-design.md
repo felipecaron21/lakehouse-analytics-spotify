@@ -107,7 +107,7 @@ PostgreSQL  →  Metabase (Dashboards)
 ## Orquestração (Airflow)
 
 **DAG 1 — `spotify_extraction`**
-- Schedule: `@weekly`
+- Schedule: manual (`schedule=None`)
 - Tasks: `auth_check` → `extract_playlists` → `extract_audio_features` → `extract_artists` → `load_to_bronze`
 - Em caso de falha: retries = 2, retry_delay = 5min
 

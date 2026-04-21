@@ -118,11 +118,9 @@ docker-compose exec airflow-scheduler python3 /opt/airflow/export/duckdb_to_post
 
 ---
 
-## 7. Atualização semanal automática
+## 7. Execução manual
 
-O DAG `spotify_extraction` está configurado com `schedule_interval="@weekly"`. Ele roda automaticamente toda semana enquanto o Docker estiver em execução.
-
-Para verificar a próxima execução agendada, acesse o Airflow → DAG `spotify_extraction` → coluna **Next Run**.
+O DAG `spotify_extraction` não possui agendamento automático (`schedule=None`). Para rodar o pipeline, acesse o Airflow → DAG `spotify_extraction` → clique no botão **Trigger DAG** (▶).
 
 ---
 

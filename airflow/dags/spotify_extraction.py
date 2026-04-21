@@ -53,7 +53,7 @@ with DAG(
     dag_id="spotify_extraction",
     default_args=default_args,
     description="Extrai dados pessoais do Spotify e carrega na camada Bronze (DuckDB)",
-    schedule="@weekly",
+    schedule=None,
     start_date=datetime(2026, 4, 21),
     catchup=False,
     tags=["spotify", "bronze", "extraction"],

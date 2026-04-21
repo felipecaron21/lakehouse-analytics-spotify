@@ -51,11 +51,10 @@ Clique em **Save** e depois **Finish**.
 
 Antes de criar dashboards, você precisa de dados no PostgreSQL. No Airflow (**http://localhost:8080**, login: `admin` / `admin`):
 
-1. Ative o DAG `spotify_extraction`
-2. Ative o DAG `spotify_transformation`
-3. No DAG `spotify_extraction`, clique em **Trigger DAG** (ícone de play)
-4. Aguarde o DAG 1 concluir — ele dispara o DAG 2 automaticamente
-5. Confirme que ambos terminaram com sucesso (status verde)
+1. Ative os DAGs `spotify_extraction` e `spotify_transformation`
+2. No DAG `spotify_extraction`, clique em **Trigger DAG** (▶)
+3. Aguarde o DAG 1 concluir — ele dispara o DAG 2 automaticamente
+4. Confirme que ambos terminaram com sucesso (status verde)
 
 ---
 
