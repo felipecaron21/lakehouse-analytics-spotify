@@ -1,23 +1,21 @@
 import requests
-from extraction.countries import COUNTRIES
+
+TIME_RANGES = ["short_term", "medium_term", "long_term"]
 
 
 def fetch_top_tracks(token: str) -> list[dict]:
     headers = {"Authorization": f"Bearer {token}"}
     records = []
 
-    for country, playlist_id in COUNTRIES.items():
-        url = f"https://api.spotify.com/v1/playlists/{playlist_id}/tracks"
-        params = {"limit": 50, "fields": "items(track(id,name,popularity,artists,album))"}
-
-        response = requests.get(url, headers=headers, params=params)
+    for time_range in TIME_RANGES:
+        response = requests.get(
+            "https://api.spotify.com/v1/me/top/tracks",
+            headers=headers,
+            params={"limit": 50, "time_range": time_range},
+        )
         response.raise_for_status()
 
-        items = response.json().get("items", [])
-        for position, item in enumerate(items, start=1):
-            track = item.get("track")
-            if not track or not track.get("id"):
-                continue
+        for position, track in enumerate(response.json().get("items", []), start=1):
             records.append({
                 "track_id": track["id"],
                 "track_name": track["name"],
@@ -26,7 +24,7 @@ def fetch_top_tracks(token: str) -> list[dict]:
                 "artist_name": track["artists"][0]["name"] if track["artists"] else None,
                 "album_name": track["album"]["name"] if track.get("album") else None,
                 "position": position,
-                "country": country,
+                "time_range": time_range,
             })
 
     return records

@@ -24,7 +24,7 @@ def load_top_tracks(records: list[dict]) -> None:
             artist_name   VARCHAR,
             album_name    VARCHAR,
             position      INTEGER,
-            country       VARCHAR,
+            time_range    VARCHAR,
             loaded_at     DATE
         )
     """)
@@ -32,7 +32,7 @@ def load_top_tracks(records: list[dict]) -> None:
     rows = [(
         r["track_id"], r["track_name"], r["popularity"],
         r["artist_id"], r["artist_name"], r["album_name"],
-        r["position"], r["country"], loaded_at,
+        r["position"], r["time_range"], loaded_at,
     ) for r in records]
     conn.executemany(
         "INSERT INTO bronze.raw_top_tracks VALUES (?,?,?,?,?,?,?,?,?)", rows
@@ -40,43 +40,17 @@ def load_top_tracks(records: list[dict]) -> None:
     conn.close()
 
 
-def load_audio_features(records: list[dict]) -> None:
+def load_top_artists(records: list[dict]) -> None:
     conn = _connect()
     conn.execute("""
-        CREATE TABLE IF NOT EXISTS bronze.raw_audio_features (
-            track_id          VARCHAR,
-            danceability      DOUBLE,
-            energy            DOUBLE,
-            valence           DOUBLE,
-            tempo             DOUBLE,
-            loudness          DOUBLE,
-            acousticness      DOUBLE,
-            instrumentalness  DOUBLE,
-            speechiness       DOUBLE,
-            loaded_at         DATE
-        )
-    """)
-    loaded_at = date.today().isoformat()
-    rows = [(
-        r["track_id"], r["danceability"], r["energy"], r["valence"],
-        r["tempo"], r["loudness"], r["acousticness"],
-        r["instrumentalness"], r["speechiness"], loaded_at,
-    ) for r in records]
-    conn.executemany(
-        "INSERT INTO bronze.raw_audio_features VALUES (?,?,?,?,?,?,?,?,?,?)", rows
-    )
-    conn.close()
-
-
-def load_artists(records: list[dict]) -> None:
-    conn = _connect()
-    conn.execute("""
-        CREATE TABLE IF NOT EXISTS bronze.raw_artists (
+        CREATE TABLE IF NOT EXISTS bronze.raw_top_artists (
             artist_id    VARCHAR,
             artist_name  VARCHAR,
             genres       VARCHAR,
             popularity   INTEGER,
             followers    BIGINT,
+            position     INTEGER,
+            time_range   VARCHAR,
             loaded_at    DATE
         )
     """)
@@ -84,9 +58,35 @@ def load_artists(records: list[dict]) -> None:
     rows = [(
         r["artist_id"], r["artist_name"],
         json.dumps(r["genres"]),
-        r["popularity"], r["followers"], loaded_at,
+        r["popularity"], r["followers"],
+        r["position"], r["time_range"], loaded_at,
     ) for r in records]
     conn.executemany(
-        "INSERT INTO bronze.raw_artists VALUES (?,?,?,?,?,?)", rows
+        "INSERT INTO bronze.raw_top_artists VALUES (?,?,?,?,?,?,?,?)", rows
+    )
+    conn.close()
+
+
+def load_recently_played(records: list[dict]) -> None:
+    conn = _connect()
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS bronze.raw_recently_played (
+            track_id     VARCHAR,
+            track_name   VARCHAR,
+            artist_id    VARCHAR,
+            artist_name  VARCHAR,
+            album_name   VARCHAR,
+            played_at    VARCHAR,
+            loaded_at    DATE
+        )
+    """)
+    loaded_at = date.today().isoformat()
+    rows = [(
+        r["track_id"], r["track_name"],
+        r["artist_id"], r["artist_name"],
+        r["album_name"], r["played_at"], loaded_at,
+    ) for r in records]
+    conn.executemany(
+        "INSERT INTO bronze.raw_recently_played VALUES (?,?,?,?,?,?,?)", rows
     )
     conn.close()

@@ -1,48 +1,32 @@
 version: 2
 
 models:
-  - name: stg_tracks
-    description: "Top 50 tracks por país com audio features — deduplicado e enriquecido."
+  - name: stg_top_tracks
+    description: "Top 50 músicas do usuário por período (4 semanas, 6 meses, todos os tempos) — deduplicado."
     columns:
       - name: track_id
-        description: "ID único da faixa no Spotify."
-        tests:
-          - not_null
-      - name: country
-        description: "País da playlist Top 50."
-        tests:
-          - not_null
+        tests: [not_null]
+      - name: time_range
+        tests: [not_null, {accepted_values: {values: ['short_term', 'medium_term', 'long_term']}}]
       - name: position
-        description: "Posição da faixa no ranking (1–50)."
-        tests:
-          - not_null
+        tests: [not_null]
       - name: loaded_at
-        description: "Data de carga na camada Bronze."
-        tests:
-          - not_null
-      - name: danceability
-        description: "Dançabilidade da faixa (0.0–1.0)."
-      - name: energy
-        description: "Energia da faixa (0.0–1.0)."
-      - name: valence
-        description: "Positividade musical da faixa (0.0–1.0)."
+        tests: [not_null]
 
-  - name: stg_artists
-    description: "Artistas com gêneros explodidos (1 linha por gênero por artista)."
+  - name: stg_top_artists
+    description: "Top 50 artistas do usuário por período com gêneros explodidos (1 linha por gênero)."
     columns:
       - name: artist_id
-        description: "ID único do artista no Spotify."
-        tests:
-          - not_null
-      - name: artist_name
-        description: "Nome do artista."
-        tests:
-          - not_null
+        tests: [not_null]
+      - name: time_range
+        tests: [not_null]
       - name: genre
-        description: "Gênero musical do artista."
-        tests:
-          - not_null
-      - name: popularity
-        description: "Popularidade do artista (0–100)."
-      - name: followers
-        description: "Total de seguidores no Spotify."
+        tests: [not_null]
+
+  - name: stg_recently_played
+    description: "Últimas 50 músicas reproduzidas com timestamp, deduplicado por track+played_at."
+    columns:
+      - name: track_id
+        tests: [not_null]
+      - name: played_at
+        tests: [not_null]

@@ -8,10 +8,10 @@ import sys
 sys.path.insert(0, "/opt/airflow")
 
 from extraction.auth import get_access_token
-from extraction.playlists import fetch_top_tracks
-from extraction.audio_features import fetch_audio_features
-from extraction.artists import fetch_artists
-from extraction.loader import load_top_tracks, load_audio_features, load_artists
+from extraction.top_tracks import fetch_top_tracks
+from extraction.top_artists import fetch_top_artists
+from extraction.recently_played import fetch_recently_played
+from extraction.loader import load_top_tracks, load_top_artists, load_recently_played
 
 default_args = {
     "owner": "airflow",
@@ -20,62 +20,58 @@ default_args = {
 }
 
 
-def task_extract_playlists(**context):
+def task_extract_top_tracks(**context):
     token = get_access_token()
     tracks = fetch_top_tracks(token)
-    context["ti"].xcom_push(key="tracks", value=tracks)
+    context["ti"].xcom_push(key="top_tracks", value=tracks)
 
 
-def task_extract_audio_features(**context):
+def task_extract_top_artists(**context):
     token = get_access_token()
-    tracks = context["ti"].xcom_pull(key="tracks", task_ids="extract_playlists")
-    track_ids = list({t["track_id"] for t in tracks})
-    features = fetch_audio_features(token, track_ids)
-    context["ti"].xcom_push(key="audio_features", value=features)
+    artists = fetch_top_artists(token)
+    context["ti"].xcom_push(key="top_artists", value=artists)
 
 
-def task_extract_artists(**context):
+def task_extract_recently_played(**context):
     token = get_access_token()
-    tracks = context["ti"].xcom_pull(key="tracks", task_ids="extract_playlists")
-    artist_ids = list({t["artist_id"] for t in tracks if t["artist_id"]})
-    artists = fetch_artists(token, artist_ids)
-    context["ti"].xcom_push(key="artists", value=artists)
+    played = fetch_recently_played(token)
+    context["ti"].xcom_push(key="recently_played", value=played)
 
 
 def task_load_bronze(**context):
     ti = context["ti"]
-    tracks = ti.xcom_pull(key="tracks", task_ids="extract_playlists")
-    features = ti.xcom_pull(key="audio_features", task_ids="extract_audio_features")
-    artists = ti.xcom_pull(key="artists", task_ids="extract_artists")
+    top_tracks = ti.xcom_pull(key="top_tracks", task_ids="extract_top_tracks")
+    top_artists = ti.xcom_pull(key="top_artists", task_ids="extract_top_artists")
+    recently_played = ti.xcom_pull(key="recently_played", task_ids="extract_recently_played")
 
-    load_top_tracks(tracks)
-    load_audio_features(features)
-    load_artists(artists)
+    load_top_tracks(top_tracks)
+    load_top_artists(top_artists)
+    load_recently_played(recently_played)
 
 
 with DAG(
     dag_id="spotify_extraction",
     default_args=default_args,
-    description="Extrai dados do Spotify e carrega na camada Bronze (DuckDB)",
+    description="Extrai dados pessoais do Spotify e carrega na camada Bronze (DuckDB)",
     schedule="@weekly",
     start_date=datetime(2026, 4, 21),
     catchup=False,
     tags=["spotify", "bronze", "extraction"],
 ) as dag:
 
-    extract_playlists = PythonOperator(
-        task_id="extract_playlists",
-        python_callable=task_extract_playlists,
+    extract_top_tracks = PythonOperator(
+        task_id="extract_top_tracks",
+        python_callable=task_extract_top_tracks,
     )
 
-    extract_audio_features = PythonOperator(
-        task_id="extract_audio_features",
-        python_callable=task_extract_audio_features,
+    extract_top_artists = PythonOperator(
+        task_id="extract_top_artists",
+        python_callable=task_extract_top_artists,
     )
 
-    extract_artists = PythonOperator(
-        task_id="extract_artists",
-        python_callable=task_extract_artists,
+    extract_recently_played = PythonOperator(
+        task_id="extract_recently_played",
+        python_callable=task_extract_recently_played,
     )
 
     load_bronze = PythonOperator(
@@ -89,4 +85,4 @@ with DAG(
         wait_for_completion=False,
     )
 
-    extract_playlists >> [extract_audio_features, extract_artists] >> load_bronze >> trigger_transformation
+    [extract_top_tracks, extract_top_artists, extract_recently_played] >> load_bronze >> trigger_transformation

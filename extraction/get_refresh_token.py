@@ -15,7 +15,7 @@ load_dotenv()
 CLIENT_ID = os.environ["SPOTIFY_CLIENT_ID"]
 CLIENT_SECRET = os.environ["SPOTIFY_CLIENT_SECRET"]
 REDIRECT_URI = "http://127.0.0.1:8888"
-SCOPE = "playlist-read-private playlist-read-collaborative"
+SCOPE = "user-top-read user-read-recently-played user-library-read"
 ENV_FILE = os.path.join(os.path.dirname(__file__), "..", ".env")
 
 auth_code = None

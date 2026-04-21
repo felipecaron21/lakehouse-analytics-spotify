@@ -7,10 +7,10 @@ from psycopg2.extras import execute_values
 DB_PATH = "/opt/airflow/data/spotify.duckdb"
 
 GOLD_TABLES = [
-    "top_tracks_by_country",
-    "top_artists_global",
+    "top_tracks_by_period",
+    "top_artists_by_period",
     "genre_distribution",
-    "audio_trends",
+    "listening_history",
 ]
 
 

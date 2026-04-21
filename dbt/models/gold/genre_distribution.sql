@@ -1,46 +1,30 @@
-WITH latest_tracks AS (
+WITH base AS (
     SELECT
-        track_id,
-        artist_id,
-        country,
-        loaded_at
-    FROM {{ ref('stg_tracks') }}
-    WHERE loaded_at = (SELECT MAX(loaded_at) FROM {{ ref('stg_tracks') }})
-),
-
-latest_artists AS (
-    SELECT
-        artist_id,
         genre,
-        loaded_at
-    FROM {{ ref('stg_artists') }}
-    WHERE loaded_at = (SELECT MAX(loaded_at) FROM {{ ref('stg_artists') }})
+        time_range,
+        COUNT(DISTINCT artist_id) AS artist_count
+    FROM {{ ref('stg_top_artists') }}
+    WHERE loaded_at = (SELECT MAX(loaded_at) FROM {{ ref('stg_top_artists') }})
+      AND genre != 'Unknown'
+    GROUP BY genre, time_range
 ),
 
-track_genres AS (
-    SELECT
-        t.country,
-        a.genre,
-        COUNT(*) AS track_count
-    FROM latest_tracks t
-    INNER JOIN latest_artists a ON t.artist_id = a.artist_id
-    GROUP BY t.country, a.genre
-),
-
-country_totals AS (
-    SELECT
-        country,
-        SUM(track_count) AS total_tracks
-    FROM track_genres
-    GROUP BY country
+totals AS (
+    SELECT time_range, SUM(artist_count) AS total
+    FROM base
+    GROUP BY time_range
 )
 
 SELECT
-    tg.country,
-    tg.genre,
-    tg.track_count,
-    ct.total_tracks,
-    ROUND(100.0 * tg.track_count / ct.total_tracks, 2) AS genre_pct
-FROM track_genres tg
-INNER JOIN country_totals ct ON tg.country = ct.country
-ORDER BY tg.country, tg.track_count DESC
+    b.genre,
+    b.time_range,
+    CASE b.time_range
+        WHEN 'short_term'  THEN '4 semanas'
+        WHEN 'medium_term' THEN '6 meses'
+        WHEN 'long_term'   THEN 'Todos os tempos'
+    END AS time_range_label,
+    b.artist_count,
+    ROUND(100.0 * b.artist_count / t.total, 2) AS genre_pct
+FROM base b
+INNER JOIN totals t ON b.time_range = t.time_range
+ORDER BY b.time_range, b.artist_count DESC
