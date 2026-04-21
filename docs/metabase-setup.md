@@ -28,18 +28,20 @@ Na primeira vez, o Metabase vai exibir um assistente de configuração inicial:
 
 ---
 
-## 3. Conectar ao PostgreSQL
+## 3. Conectar ao banco spotify_analytics
 
 Preencha os campos com os valores do seu `.env`:
 
 | Campo | Valor |
 |---|---|
-| Display name | Spotify Lakehouse |
+| Display name | Spotify Analytics |
 | Host | `postgres` |
 | Port | `5432` |
-| Database name | `spotify_lakehouse` |
+| Database name | `spotify_analytics` |
 | Username | `spotify` |
 | Password | `spotify` |
+
+> **Atenção:** use `spotify_analytics` e não `spotify_lakehouse`. O banco `spotify_lakehouse` contém tabelas internas do Airflow.
 
 Clique em **Save** e depois **Finish**.
 
@@ -50,50 +52,75 @@ Clique em **Save** e depois **Finish**.
 Antes de criar dashboards, você precisa de dados no PostgreSQL. No Airflow (**http://localhost:8080**, login: `admin` / `admin`):
 
 1. Ative o DAG `spotify_extraction`
-2. Clique em **Trigger DAG** (ícone de play)
-3. Aguarde o DAG concluir — ele vai disparar automaticamente o `spotify_transformation`
-4. Confirme que ambos os DAGs terminaram com sucesso (status verde)
+2. Ative o DAG `spotify_transformation`
+3. No DAG `spotify_extraction`, clique em **Trigger DAG** (ícone de play)
+4. Aguarde o DAG 1 concluir — ele dispara o DAG 2 automaticamente
+5. Confirme que ambos terminaram com sucesso (status verde)
 
 ---
 
-## 5. Criar os dashboards
+## 5. Tabelas disponíveis
 
-No Metabase, clique em **+ New → Dashboard** e nomeie como `Spotify Analytics`.
+Após o pipeline rodar, o banco `spotify_analytics` terá 4 tabelas:
 
-### Dashboard 1 — Top Tracks por País
+| Tabela | Descrição |
+|---|---|
+| `top_tracks_by_period` | Suas 50 músicas mais ouvidas por período |
+| `top_artists_by_period` | Seus 50 artistas mais ouvidos por período |
+| `listening_history` | Últimas 50 músicas reproduzidas com timestamp |
+| `listening_patterns` | Padrões de escuta por dia da semana e hora do dia |
+
+Os períodos disponíveis em `top_tracks_by_period` e `top_artists_by_period`:
+
+| `time_range` | `time_range_label` | Descrição |
+|---|---|---|
+| `short_term` | 4 semanas | Últimas 4 semanas |
+| `medium_term` | 6 meses | Últimos 6 meses |
+| `long_term` | Todos os tempos | Histórico completo |
+
+---
+
+## 6. Criar os dashboards
+
+No Metabase, clique em **+ New → Dashboard** e nomeie como `Meu Spotify`.
+
+### Dashboard 1 — Minhas Músicas Favoritas
 
 1. Clique em **+ Add a question**
-2. Escolha a tabela `top_tracks_by_country`
-3. Filtre por `country` e ordene por `position`
-4. Adicione um filtro interativo de país no dashboard
+2. Escolha a tabela `top_tracks_by_period`
+3. Filtre por `time_range = short_term`
+4. Ordene por `position` (crescente)
+5. Visualização: **Table** com colunas `position`, `track_name`, `artist_name`, `popularity`
+6. Adicione um filtro interativo de `time_range_label` no dashboard para alternar entre períodos
 
-### Dashboard 2 — Top Artistas Globais
+### Dashboard 2 — Meus Artistas Favoritos
 
-1. Nova question → tabela `top_artists_global`
+1. Nova question → tabela `top_artists_by_period`
+2. Filtre por `time_range = medium_term`
+3. Ordene por `position` (crescente)
+4. Visualização: **Table** com `position`, `artist_name`, `followers`
+5. Adicione filtro interativo de período
+
+### Dashboard 3 — Histórico Recente
+
+1. Nova question → tabela `listening_history`
+2. Visualização: **Table**
+3. Ordene por `played_at` (decrescente)
+4. Colunas: `track_name`, `artist_name`, `played_at`
+
+### Dashboard 4 — Quando Você Ouve Música
+
+1. Nova question → tabela `listening_patterns`
 2. Visualização: **Bar chart**
-3. Eixo X: `artist_name`, Eixo Y: `countries_count`
-4. Limite: top 20 artistas
-
-### Dashboard 3 — Distribuição de Gêneros
-
-1. Nova question → tabela `genre_distribution`
-2. Visualização: **Pie chart** ou **Bar chart**
-3. Filtre por `country` para comparar países
-4. Adicione filtro interativo de país
-
-### Dashboard 4 — Audio Trends
-
-1. Nova question → tabela `audio_trends`
-2. Visualização: **Line chart**
-3. Eixo X: `week`, Eixo Y: `avg_danceability`, `avg_energy`, `avg_valence`
-4. Filtre por `country` para ver evolução semanal
+3. Eixo X: `day_name`, Eixo Y: `plays`
+4. Segunda visualização: Eixo X: `hour_of_day`, Eixo Y: `plays` (para ver o horário de pico)
 
 ---
 
-## 6. Acessar a documentação do dbt
+## 7. Acessar a documentação do dbt
 
 A documentação gerada pelo dbt (lineage, modelos, testes) fica disponível em:
 
 **http://localhost:8081**
 
-> O serviço `dbt-docs` executa `dbt docs generate` na inicialização e serve o site estático. Na primeira vez pode demorar alguns segundos para ficar disponível.
+> O serviço `dbt-docs` executa `dbt docs generate` na inicialização e serve o site estático. Estará disponível após o primeiro run do pipeline.
