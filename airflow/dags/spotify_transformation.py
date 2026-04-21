@@ -26,7 +26,7 @@ with DAG(
     dag_id="spotify_transformation",
     default_args=default_args,
     description="Executa modelos dbt (Silver e Gold) e exporta para PostgreSQL",
-    schedule_interval=None,  # disparado pelo DAG de extração
+    schedule=None,  # disparado pelo DAG de extração
     start_date=datetime(2026, 4, 21),
     catchup=False,
     tags=["spotify", "silver", "gold", "dbt"],
