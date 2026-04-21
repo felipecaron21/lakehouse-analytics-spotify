@@ -1,0 +1,48 @@
+version: 2
+
+models:
+  - name: stg_tracks
+    description: "Top 50 tracks por país com audio features — deduplicado e enriquecido."
+    columns:
+      - name: track_id
+        description: "ID único da faixa no Spotify."
+        tests:
+          - not_null
+      - name: country
+        description: "País da playlist Top 50."
+        tests:
+          - not_null
+      - name: position
+        description: "Posição da faixa no ranking (1–50)."
+        tests:
+          - not_null
+      - name: loaded_at
+        description: "Data de carga na camada Bronze."
+        tests:
+          - not_null
+      - name: danceability
+        description: "Dançabilidade da faixa (0.0–1.0)."
+      - name: energy
+        description: "Energia da faixa (0.0–1.0)."
+      - name: valence
+        description: "Positividade musical da faixa (0.0–1.0)."
+
+  - name: stg_artists
+    description: "Artistas com gêneros explodidos (1 linha por gênero por artista)."
+    columns:
+      - name: artist_id
+        description: "ID único do artista no Spotify."
+        tests:
+          - not_null
+      - name: artist_name
+        description: "Nome do artista."
+        tests:
+          - not_null
+      - name: genre
+        description: "Gênero musical do artista."
+        tests:
+          - not_null
+      - name: popularity
+        description: "Popularidade do artista (0–100)."
+      - name: followers
+        description: "Total de seguidores no Spotify."
