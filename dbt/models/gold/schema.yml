@@ -1,0 +1,77 @@
+version: 2
+
+models:
+  - name: top_tracks_by_country
+    description: "Ranking semanal das Top 50 músicas por país com variação de posição em relação à semana anterior."
+    columns:
+      - name: track_id
+        description: "ID da faixa no Spotify."
+        tests:
+          - not_null
+      - name: country
+        description: "País do ranking."
+        tests:
+          - not_null
+      - name: position
+        description: "Posição atual no ranking (1–50)."
+        tests:
+          - not_null
+      - name: position_change
+        description: "Variação em relação à semana anterior: new, up, down, stable."
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['new', 'up', 'down', 'stable']
+      - name: week
+        description: "Data de referência da semana."
+        tests:
+          - not_null
+
+  - name: top_artists_global
+    description: "Artistas com maior presença global nos charts, ordenados por número de países simultâneos."
+    columns:
+      - name: artist_id
+        description: "ID do artista no Spotify."
+        tests:
+          - not_null
+          - unique
+      - name: countries_count
+        description: "Número de países onde o artista aparece nos Top 50."
+        tests:
+          - not_null
+      - name: avg_position
+        description: "Posição média do artista nos países onde aparece."
+
+  - name: genre_distribution
+    description: "Distribuição percentual de gêneros musicais por país na semana mais recente."
+    columns:
+      - name: country
+        description: "País do ranking."
+        tests:
+          - not_null
+      - name: genre
+        description: "Gênero musical."
+        tests:
+          - not_null
+      - name: genre_pct
+        description: "Percentual do gênero no total de faixas do país."
+        tests:
+          - not_null
+
+  - name: audio_trends
+    description: "Médias semanais de audio features por país para acompanhar tendências ao longo do tempo."
+    columns:
+      - name: country
+        description: "País do ranking."
+        tests:
+          - not_null
+      - name: week
+        description: "Semana de referência."
+        tests:
+          - not_null
+      - name: avg_danceability
+        description: "Média de dançabilidade das faixas (0.0–1.0)."
+      - name: avg_energy
+        description: "Média de energia das faixas (0.0–1.0)."
+      - name: avg_valence
+        description: "Média de valência (positividade) das faixas (0.0–1.0)."
