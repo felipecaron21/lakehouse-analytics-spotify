@@ -21,14 +21,14 @@ models:
       - name: time_range
         tests: [not_null]
 
-  - name: genre_distribution
-    description: "Distribuição percentual de gêneros nos artistas favoritos por período."
+  - name: listening_patterns
+    description: "Padrões de escuta agregados por dia e hora a partir do histórico recente."
     columns:
-      - name: genre
+      - name: played_date
         tests: [not_null]
-      - name: time_range
+      - name: hour_of_day
         tests: [not_null]
-      - name: genre_pct
+      - name: plays
         tests: [not_null]
 
   - name: listening_history

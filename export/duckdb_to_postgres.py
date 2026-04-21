@@ -9,8 +9,8 @@ DB_PATH = "/opt/airflow/data/spotify.duckdb"
 GOLD_TABLES = [
     "top_tracks_by_period",
     "top_artists_by_period",
-    "genre_distribution",
     "listening_history",
+    "listening_patterns",
 ]
 
 
@@ -46,7 +46,7 @@ def export():
     for table in GOLD_TABLES:
         print(f"Exporting gold.{table}...")
 
-        df = duck.execute(f"SELECT * FROM gold.{table}").fetchdf()
+        df = duck.execute(f"SELECT * FROM main_gold.{table}").fetchdf()
 
         if df.empty:
             print(f"  Skipped — no data in gold.{table}")
