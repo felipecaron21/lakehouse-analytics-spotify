@@ -1,0 +1,32 @@
+version: 2
+
+models:
+  - name: stg_top_tracks
+    description: "Top 50 músicas do usuário por período (4 semanas, 6 meses, todos os tempos) — deduplicado."
+    columns:
+      - name: track_id
+        tests: [not_null]
+      - name: time_range
+        tests: [not_null, {accepted_values: {values: ['short_term', 'medium_term', 'long_term']}}]
+      - name: position
+        tests: [not_null]
+      - name: loaded_at
+        tests: [not_null]
+
+  - name: stg_top_artists
+    description: "Top 50 artistas do usuário por período com gêneros explodidos (1 linha por gênero)."
+    columns:
+      - name: artist_id
+        tests: [not_null]
+      - name: time_range
+        tests: [not_null]
+      - name: genre
+        tests: [not_null]
+
+  - name: stg_recently_played
+    description: "Últimas 50 músicas reproduzidas com timestamp, deduplicado por track+played_at."
+    columns:
+      - name: track_id
+        tests: [not_null]
+      - name: played_at
+        tests: [not_null]

@@ -1,0 +1,40 @@
+version: 2
+
+models:
+  - name: top_tracks_by_period
+    description: "Top 50 músicas do usuário por período com label em português."
+    columns:
+      - name: track_id
+        tests: [not_null]
+      - name: position
+        tests: [not_null]
+      - name: time_range
+        tests: [not_null, {accepted_values: {values: ['short_term', 'medium_term', 'long_term']}}]
+
+  - name: top_artists_by_period
+    description: "Top 50 artistas do usuário por período com gênero e métricas."
+    columns:
+      - name: artist_id
+        tests: [not_null]
+      - name: position
+        tests: [not_null]
+      - name: time_range
+        tests: [not_null]
+
+  - name: listening_patterns
+    description: "Padrões de escuta agregados por dia e hora a partir do histórico recente."
+    columns:
+      - name: played_date
+        tests: [not_null]
+      - name: hour_of_day
+        tests: [not_null]
+      - name: plays
+        tests: [not_null]
+
+  - name: listening_history
+    description: "Histórico recente de reproduções com contagem de plays por faixa."
+    columns:
+      - name: track_id
+        tests: [not_null]
+      - name: played_at
+        tests: [not_null]

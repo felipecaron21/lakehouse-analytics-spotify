@@ -1,0 +1,7 @@
+spotify_lakehouse:
+  target: dev
+  outputs:
+    dev:
+      type: duckdb
+      path: /opt/airflow/data/spotify.duckdb
+      threads: 4
