@@ -110,8 +110,8 @@ docker-compose up -d --build
 
 1. Acesse o Airflow em http://localhost:8080
 2. Ative os DAGs `spotify_extraction` e `spotify_transformation`
-3. Dispare o `spotify_extraction` manualmente (botão ▶)
-4. Aguarde — o DAG 2 é disparado automaticamente ao final
+3. Dispare o `spotify_extraction` manualmente
+4. Aguarde o DAG 2 é disparado automaticamente ao final
 
 O pipeline é disparado manualmente pelo Airflow.
 
